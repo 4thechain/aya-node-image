@@ -1,0 +1,16 @@
+#Start the Aya validator
+[Unit]
+Description=AyA Node
+After=network.target
+
+[Service]
+WorkingDirectory=/home/aya/aya-node
+ExecStart=/home/aya/aya-node/start_aya_validator.sh
+User=aya
+Restart=always
+RestartSec=90
+#Set the maximum number of file descriptors
+LimitNOFILE=4096
+
+[Install]
+WantedBy=multi-user.target
