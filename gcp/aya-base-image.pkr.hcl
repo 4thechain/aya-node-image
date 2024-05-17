@@ -28,6 +28,7 @@ source "googlecompute" "aya-base-image" {
   ssh_username        = "aya"
   zone                = var.gcp_zone
   image_name          = "aya-base-image-${local.timestamp_qualifier}"
+  image_family        = "aya-base-image"
   image_labels = {
     "os" : "ubuntu"
     "application" : "aya"
