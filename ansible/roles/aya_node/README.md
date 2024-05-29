@@ -17,7 +17,7 @@ The following variables can be customized in your playbook:
 split_session_key_script_path: /home/aya/utils/session_key_tools/split_session_key.sh
 
 # AYA node version to download
-aya_node_version: devnet-v.0.2.0
+aya_node_version: devnet-v.0.3.0
 
 # URL for the AYA node binary
 aya_node_binary_url: "https://github.com/worldmobilegroup/aya-node/releases/download/{{ aya_node_version }}/aya-node"
@@ -43,7 +43,7 @@ Here's an example playbook that uses this role:
     - role: aya_node
       vars:
       split_session_key_script_path: /home/aya/utils/session_key_tools/split_session_key.sh
-      aya_node_version: devnet-v.0.2.0
+      aya_node_version: devnet-v.0.3.0
 ```
 
 ## License
