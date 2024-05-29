@@ -24,6 +24,12 @@ packer build -var 'gcp_project_id=YOUR_GCP_PROJECT_ID' -var 'gcp_zone=YOUR_GCP_Z
 
 You should have Packer installed and configured with your provider. For installation instructions, refer to the [Packer documentation](https://developer.hashicorp.com/packer/tutorials/docker-get-started/get-started-install-cli).
 
+## Using the Ansible Role Directly
+If you prefer to use Ansible directly to set up the AYA node on your server without using Packer, you can use the aya_node role. This approach is useful for users who want to integrate the AYA node setup into their existing Ansible-managed infrastructure.
+
+See the ansible directory README for more info.
+
+
 ## Connect with Us
 
 If you like this contribution to the World Mobile community, give us a follow on [Twitter](https://twitter.com/4thechain). You can also visit our [website](https://4thechain.com/) for more information about 4TheChain.
