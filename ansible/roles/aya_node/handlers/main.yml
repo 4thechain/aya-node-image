@@ -1,0 +1,10 @@
+---
+- name: Reload systemd
+  command: systemctl daemon-reload
+
+- name: Restart aya-node
+  systemd:
+    name: aya-node
+    state: restarted
+
+

@@ -1,0 +1,108 @@
+---
+- name: Install necessary packages
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - git
+    - clang
+    - curl
+    - libssl-dev
+    - llvm
+    - libudev-dev
+    - make
+    - protobuf-compiler
+    - pkg-config
+    - build-essential
+    - jq
+    - unzip
+
+- name: Create aya user with sudo privileges
+  user:
+    name: aya
+    groups: sudo
+    append: yes
+    shell: /bin/bash
+
+- name: Add aya to sudoers with no password prompt
+  lineinfile:
+    path: /etc/sudoers
+    state: present
+    regexp: '^aya '
+    line: 'aya ALL=(ALL) NOPASSWD:ALL'
+
+- name: Create the aya-node and target/release directories
+  file:
+    path: /home/aya/aya-node/target/release
+    state: directory
+    owner: aya
+    group: aya
+    mode: '0755'
+    recurse: yes
+
+- name: Download wm-devnet-chainspec.json
+  get_url:
+    url: "{{ aya_node_chainspec_url }}"
+    dest: /home/aya/aya-node/wm-devnet-chainspec.json
+  become: yes
+  become_user: aya
+
+- name: Download aya-node binary
+  get_url:
+    url: "{{ aya_node_binary_url }}"
+    dest: /home/aya/aya-node/target/release/aya-node
+  become: yes
+  become_user: aya
+
+- name: Ensure aya-node binary is executable
+  file:
+    path: /home/aya/aya-node/target/release/aya-node
+    mode: '0755'
+
+- name: Make sure {{ split_session_key_script_path | dirname }} dir exists
+  file:
+    path: "{{ split_session_key_script_path | dirname }}"
+    state: directory
+    recurse: yes
+    owner: aya
+    group: aya
+
+- name: Copy split_session_key.sh script
+  copy:
+    src: "{{ role_path }}/files/split_session_key.sh"
+    dest: "{{ split_session_key_script_path }}"
+    owner: aya
+    group: aya
+    mode: '0755'
+
+- name: Set AYA_HOME environment variable
+  lineinfile:
+    path: /etc/bash.bashrc
+    state: present
+    line: 'export AYA_HOME=/home/aya/aya-node'
+
+- name: Copy start_aya_validator.sh script
+  copy:
+    src: "{{ role_path }}/files/start_aya_validator.sh"
+    dest: /home/aya/aya-node/start_aya_validator.sh
+    owner: aya
+    group: aya
+    mode: '0755'
+  notify:
+    - Restart aya-node
+
+- name: Copy aya-node.service file
+  copy:
+    src: "{{ role_path }}/files/aya-node.service"
+    dest: /etc/systemd/system/aya-node.service
+    mode: '0644'
+  notify:
+    - Reload systemd
+    - Restart aya-node
+
+- name: Enable and start aya-node service
+  systemd:
+    name: aya-node
+    enabled: yes
+    state: started

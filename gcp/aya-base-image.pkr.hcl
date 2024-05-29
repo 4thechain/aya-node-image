@@ -4,6 +4,10 @@ packer {
       version = " >= 1.0.0 "
       source  = "github.com/hashicorp/googlecompute"
     }
+    ansible = {
+      version = ">= 1.0.0"
+      source = "github.com/hashicorp/ansible"
+    }
   }
 }
 
@@ -49,10 +53,14 @@ build {
       "export DEBIAN_FRONTEND=noninteractive",
       "sudo apt-get update",
       "sudo apt-get upgrade -y",
-      "sudo apt install -y git clang curl libssl-dev llvm libudev-dev make protobuf-compiler pkg-config build-essential jq unzip",
-      "echo 'aya ALL=(ALL) NOPASSWD:ALL' | sudo tee /etc/sudoers.d/aya",
     ]
     execute_command = "/usr/bin/cloud-init status --wait && sudo -E -S sh '{{ .Path }}'" # This is added to mitigate potential race conditions with cloud-init
+  }
+
+  # Run Ansible Playbook for AYA Node
+  provisioner "ansible" {
+    playbook_file = "../ansible/aya-node-playbook.yml"
+    extra_arguments = [ "--scp-extra-args", "'-O'" ]
   }
 
   provisioner "shell" {
@@ -60,46 +68,6 @@ build {
       "export DEBIAN_FRONTEND=noninteractive",
       "echo 'version: 1' > /home/aya/iso_image_version.yaml",
       "echo 'timestamp: ${local.timestamp_qualifier}' >> /home/aya/iso_image_version.yaml",
-      "mkdir -p /home/aya/utils/session_key_tools"
-    ]
-  }
-
-  provisioner "shell" {
-    script = "../common/get_aya_software.sh"
-  }
-
-  provisioner "file" {
-    source      = "../common/split_session_key.sh"
-    destination = "/home/aya/utils/session_key_tools/split_session_key.sh"
-  }
-
-  provisioner "shell" {
-    inline = [
-      "chmod +x utils/session_key_tools/split_session_key.sh",
-      "sudo bash -c \"echo 'export AYA_HOME=/home/aya/aya-node' >> /etc/bash.bashrc\"",
-    ]
-  }
-
-  provisioner "file" {
-    source      = "../common/start_aya_validator.sh"
-    destination = "/home/aya/aya-node/start_aya_validator.sh"
-  }
-
-  provisioner "shell" {
-    inline = [
-      "chmod +x /home/aya/aya-node/start_aya_validator.sh",
-    ]
-  }
-
-  provisioner "file" {
-    source      = "../common/aya-node.service"
-    destination = "/home/aya/aya-node.service"
-  }
-
-  provisioner "shell" {
-    inline = [
-      "sudo mv /home/aya/aya-node.service /etc/systemd/system/aya-node.service",
-      "sudo systemctl enable aya-node.service",
     ]
   }
 
