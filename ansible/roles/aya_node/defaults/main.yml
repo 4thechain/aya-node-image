@@ -1,0 +1,8 @@
+---
+split_session_key_script_path: /home/aya/utils/session_key_tools/split_session_key.sh
+# AYA node version to download
+aya_node_version: devnet-v.0.2.0
+# URL for the AYA node binary
+aya_node_binary_url: "https://github.com/worldmobilegroup/aya-node/releases/download/{{ aya_node_version }}/aya-node"
+# URL for the AYA node chainspec file
+aya_node_chainspec_url: "https://github.com/worldmobilegroup/aya-node/releases/download/{{ aya_node_version }}/wm-devnet-chainspec.json"
