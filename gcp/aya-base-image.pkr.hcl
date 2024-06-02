@@ -22,6 +22,12 @@ variable "gcp_zone" {
   default     = "europe-west1-b"
 }
 
+variable "enable_node_exporter" {
+  type        = bool
+  description = "Enable Node Exporter installation"
+  default     = false
+}
+
 locals {
   timestamp_qualifier = formatdate("YYYYMMDD-hhmm", timestamp())
 }
@@ -61,6 +67,12 @@ build {
   provisioner "ansible" {
     playbook_file = "../ansible/aya-node-playbook.yml"
     extra_arguments = [ "--scp-extra-args", "'-O'" ]
+  }
+
+  # Conditionally run the playbook to install Node Exporter
+  provisioner "ansible" {
+    playbook_file = "../ansible/node_exporter-playbook.yml"
+    extra_arguments = [ "--extra-vars", "enable_node_exporter=${var.enable_node_exporter}","--scp-extra-args", "'-O'" ]
   }
 
   provisioner "shell" {
