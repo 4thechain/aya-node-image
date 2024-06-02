@@ -19,10 +19,42 @@ The image is stored in the eu region by default. You can add the gcp zone to sto
 packer build -var 'gcp_project_id=YOUR_GCP_PROJECT_ID' -var 'gcp_zone=YOUR_GCP_ZONE' aya-base-image.pkr.hcl
 ```
 
+If you would like to enable node_exporter on the image. You do so with a variable setting eg. 'enable_node_exporter' .
+We use an existing ansible role which you will need to install.
+
+```sh
+ansible-galaxy install geerlingguy.node_exporter
+```
+
+To command to build with node_exporter enabled.
+
+```sh
+packer build -var 'gcp_project_id=YOUR_GCP_PROJECT_ID' -var 'gcp_zone=YOUR_GCP_ZONE' -var 'enable_node_exporter=true' aya-base-image.pkr.hcl
+```
 
 ## Prerequisites
 
+- Packer
+- Ansible
+
+### Installing Packer
 You should have Packer installed and configured with your provider. For installation instructions, refer to the [Packer documentation](https://developer.hashicorp.com/packer/tutorials/docker-get-started/get-started-install-cli).
+
+### Installing Ansible
+
+On Ubuntu:
+
+```sh
+sudo apt update
+sudo apt install -y ansible
+```
+
+On macOS using Homebrew:
+```sh
+brew install ansible
+```
+
+For other operating systems and installation methods, refer to the [Ansible installation guide](https://docs.ansible.com/ansible/latest/installation_guide/index.html).
 
 ## Using the Ansible Role Directly
 If you prefer to use Ansible directly to set up the AYA node on your server without using Packer, you can use the aya_node role. This approach is useful for users who want to integrate the AYA node setup into their existing Ansible-managed infrastructure.
